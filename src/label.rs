@@ -1,0 +1,13 @@
+pub const TITLE: &str = "de.l3s.boilerpipe/TITLE";
+pub const ARTICLE_METADATA: &str = "de.l3s.boilerpipe/ARTICLE_METADATA";
+pub const MIGHT_BE_CONTENT: &str = "de.l3s.boilerpipe/MIGHT_BE_CONTENT";
+pub const VERY_LIKELY_CONTENT: &str = "de.l3s.boilerpipe/VERY_LIKELY_CONTENT";
+pub const HR: &str = "de.l3s.boilerpipe/HR";
+pub const LI: &str = "de.l3s.boilerpipe/LI";
+pub const HEADING: &str = "de.l3s.boilerpipe/HEADING";
+pub const H1: &str = "de.l3s.boilerpipe/H1";
+pub const H2: &str = "de.l3s.boilerpipe/H2";
+pub const H3: &str = "de.l3s.boilerpipe/H3";
+pub const BOILERPLATE_HEADING_FUSED: &str = "BOILERPLATE_HEADING_FUSED";
+pub const STRICTLY_NOT_CONTENT: &str = "STRICTLY_NOT_CONTENT";
+pub const SIBLING_OF_MAIN_CONTENT: &str = "SIBLING_OF_MAIN_CONTENT";

@@ -1,0 +1,50 @@
+Rust-DomDistiller is a new native Rust translation of Go-DomDistiller at
+25b8d046ffb4053bf68345d6fa59bc9ae1961ad8. The files under src/ are translated
+and modified implementations, not unchanged upstream source files.
+
+Go-DomDistiller: Copyright (c) 2020 Markus Mobius. MIT License in LICENSE.
+The Go port was implemented by Radhi Fadlillah, as credited upstream.
+
+Chromium DOM Distiller: Copyright 2014 The Chromium Authors. BSD-3-Clause
+and Apache-2.0 terms are retained in licenses/LICENSE-chromium.txt.
+The pinned Go module's LICENSE-domdistiller.txt is empty; that original is
+retained separately as licenses/LICENSE-domdistiller-upstream.txt.
+The complete notice comes from Chromium revision
+2a180397710719913340a12804affc65b789275e, not from an invented replacement.
+
+Boilerpipe: the original copyright, Apache-2.0 license statement, and NOTICE
+are retained in licenses/LICENSE-boilerpipe.txt and
+licenses/NOTICE-boilerpipe.txt. The complete Apache-2.0 terms appear in
+licenses/LICENSE-chromium.txt. Java/GWT runtime dependencies are not used.
+
+Shiori DOM: Copyright (c) 2019-present Radhi Fadlillah. Reader, DOM helper,
+attribute, and output behavior is adapted under licenses/LICENSE-shiori.txt.
+
+Go: Copyright 2009 The Go Authors. URL parsing/resolution and legacy decoder
+behavior/tables are adapted from Go 1.27.1, x/net v0.29.0, and x/text v0.18.0
+under licenses/LICENSE-go.txt. Those three original license files have
+identical bytes in the pinned references.
+
+chardet: Copyright (c) 2012 chardet Authors. Charset recognition logic and
+tables are adapted under licenses/LICENSE-chardet.txt and
+licenses/icu-license.html. The ICU-derived portions retain the copyright
+and permission notice of International Business Machines Corporation and
+others, 1995-2012. No endorsement by the original authors is implied.
+
+The development fixture includes the saved page shipped in the pinned Go
+module, with its original page content and attribution. The page is from
+VICE and is used only as a compatibility regression input. This does not
+assert new licensing rights over third-party article text or media.
+
+The development benchmark scorer and manifest interpretation are adapted from
+markusmobius/content-extractor-benchmark at
+466fdbee8a504441eb78ed11d71c1da220681cab under Apache-2.0. That benchmark was
+adapted from Go-Trafilatura's comparison code. The full Apache-2.0 terms are
+retained in licenses/LICENSE-chromium.txt. Downloaded third-party benchmark
+pages and extracted articles keep their original rights and are not bundled
+with this package. Testdata includes measurements, not those article outputs.
+
+The exact source locations and SHA-256 fingerprints are recorded in
+testdata/provenance.json and UPSTREAM.md. Rust dependencies carry their
+own notices; see Cargo.lock and their package licenses when redistributing
+binaries.

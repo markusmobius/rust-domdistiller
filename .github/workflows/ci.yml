@@ -1,0 +1,41 @@
+name: Verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.98.1
+          components: rustfmt, clippy
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.27.1
+          cache-dependency-path: tools/go-reference/go.sum
+      - run: cargo fmt --all -- --check
+      - run: cargo test --locked
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked --release
+      - run: cargo build --locked --release
+      - run: go -C tools/go-reference test -mod=readonly ./...
+        env:
+          GOWORK: off
+          CGO_ENABLED: '0'
+      - run: go -C tools/go-reference vet -mod=readonly ./...
+      - run: go -C tools/go-reference mod verify
+      - run: go -C tools/go-reference mod tidy -diff
+      - run: cargo test --locked --lib live_go_parity -- --ignored --nocapture
+      - run: cargo package --locked

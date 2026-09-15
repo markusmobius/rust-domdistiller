@@ -1,0 +1,116 @@
+[
+  {
+    "source": "github.com/markusmobius/go-domdistiller@v0.0.0-20240926050704-25b8d046ffb4/LICENSE",
+    "destination": "LICENSE",
+    "sha256": "1c54129c60c300548c4f28ce8a9d348def9f2d6295aacc0a719c709ec7a3a84a",
+    "bytes": 1069
+  },
+  {
+    "source": "github.com/markusmobius/go-domdistiller@v0.0.0-20240926050704-25b8d046ffb4/LICENSE-domdistiller.txt",
+    "destination": "licenses/LICENSE-domdistiller-upstream.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "source": "github.com/markusmobius/go-domdistiller@v0.0.0-20240926050704-25b8d046ffb4/LICENSE-boilerpipe.txt",
+    "destination": "licenses/LICENSE-boilerpipe.txt",
+    "sha256": "892e8f128e95162bc4c30527e3c9e82bc78cc8c76f0150dfb2b7d1c70ab9866b",
+    "bytes": 610
+  },
+  {
+    "source": "github.com/markusmobius/go-domdistiller@v0.0.0-20240926050704-25b8d046ffb4/NOTICE-boilerpipe.txt",
+    "destination": "licenses/NOTICE-boilerpipe.txt",
+    "sha256": "746e4b278067fcdf344fad40e6f113e18ef27713d3a504e4e330a188219f4b78",
+    "bytes": 775
+  },
+  {
+    "source": "github.com/go-shiori/dom@v0.0.0-20230515143342-73569d674e1c/LICENSE",
+    "destination": "licenses/LICENSE-shiori.txt",
+    "sha256": "eda05bafdea921ce34e502fbd2c3d5c508b7601b8b592e2a0bd48eaa451ca632",
+    "bytes": 1080
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/LICENSE",
+    "destination": "licenses/LICENSE-chardet.txt",
+    "sha256": "44699611628b82dec802229cd039c401b6df44808eeb5dc873698255a0642d04",
+    "bytes": 1174
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/icu-license.html",
+    "destination": "licenses/icu-license.html",
+    "sha256": "b82a5901d92c842c78feb7ffc757706967a23fd5e7658d30ea92abb169207867",
+    "bytes": 1981
+  },
+  {
+    "source": "golang.org/x/text@v0.18.0/LICENSE",
+    "destination": "licenses/LICENSE-go.txt",
+    "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "bytes": 1453
+  },
+  {
+    "source": "golang.org/x/net@v0.29.0/LICENSE",
+    "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "bytes": 1453
+  },
+  {
+    "source": "github.com/markusmobius/go-domdistiller@v0.0.0-20240926050704-25b8d046ffb4/example/sample.html",
+    "sha256": "f37c2a8ea3b48f3d154b21bf0cf030f5ccef95e607561418dfc52d77fa5e7930",
+    "bytes": 328232
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/detector.go",
+    "sha256": "36f98afc3766c95bc90133bdd3dd9faaebf9282c4b4c38a4a13e23682e68721e",
+    "bytes": 3959
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/single_byte.go",
+    "sha256": "a13425d7f2d9f1b9f63e71af86794170cfcf9730686677c142eed520f41bcfb3",
+    "bytes": 45940
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/multi_byte.go",
+    "sha256": "9c345476a54c4b5439021fc06fe8cdb3dd306dcdd73171c6a7c12a7af2cfac9c",
+    "bytes": 9534
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/2022.go",
+    "sha256": "ad80f67dd1726f58255a7fd74933f458451901c5577448eed42462acf00860a0",
+    "bytes": 2277
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/utf8.go",
+    "sha256": "c19d934c7eec274d9e13fd6be4519680f00e5bacb39630a8437f6f1c4da9ea93",
+    "bytes": 1373
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/unicode.go",
+    "sha256": "251a89225dc9f472d3ba7dc68585d10e8509d1a45588e04322ca7ed6d082b253",
+    "bytes": 2290
+  },
+  {
+    "source": "github.com/gogs/chardet@v0.0.0-20211120154057-b7413eaefb8f/recognizer.go",
+    "sha256": "87f3b18d354c077edb60288d7de674c0d7b7a131db2196cc6368696193055af1",
+    "bytes": 1631
+  },
+  {
+    "source": "golang.org/x/text@v0.18.0/encoding/simplifiedchinese/tables.go",
+    "sha256": "c9ba772952593013705397e20afe0a25e87eb534a36c3c8aec93923557f7d663",
+    "bytes": 879006
+  },
+  {
+    "source": "go1.27.1/LICENSE",
+    "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "bytes": 1453
+  },
+  {
+    "source": "go1.27.1/src/net/url/url.go",
+    "sha256": "44c33f88526abf3b5955d6c97297be5c9d228e741b33e52c940dcac5a496e091",
+    "bytes": 38458
+  },
+  {
+    "source": "https://raw.githubusercontent.com/chromium/dom-distiller/2a180397710719913340a12804affc65b789275e/LICENSE",
+    "destination": "licenses/LICENSE-chromium.txt",
+    "sha256": "560c13594cab53e1edc37bb1bf3fe4aa128146cd5dd990f63854d9d7d1f7cce1",
+    "bytes": 10880
+  }
+]

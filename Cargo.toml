@@ -1,0 +1,25 @@
+[package]
+name = "rust-domdistiller"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.98.1"
+description = "Native Rust port of Go-DomDistiller"
+repository = "https://github.com/markusmobius/rust-domdistiller"
+readme = "README.md"
+license = "MIT AND BSD-3-Clause AND Apache-2.0 AND ICU"
+include = ["src/**", "examples/**", "testdata/**", "tools/go-reference/**", "licenses/**", "LICENSE", "NOTICE", "README.md", "UPSTREAM.md", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml"]
+
+[dependencies]
+regex = "1.12"
+html5gum = { version = "0.8.4", features = ["tree-builder"] }
+html5ever = "0.29.1"
+markup5ever_rcdom = "0.5.0-unofficial"
+percent-encoding = "2.3"
+unicode-normalization = "0.1"
+encoding_rs = "0.8"
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+tempfile = "3"
+sha2 = "0.10"

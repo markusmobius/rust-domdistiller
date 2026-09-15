@@ -1,0 +1,707 @@
+{
+  "created_utc": "2026-09-15T07:39:53.882341+00:00",
+  "corpus_commit": "466fdbee8a504441eb78ed11d71c1da220681cab",
+  "go_commit": "25b8d046ffb4053bf68345d6fa59bc9ae1961ad8",
+  "corpus_sha256": "0e8b21bc8c28a88a90d891d91020a21aab95a2cfa83f761dd2b1642d98c757ea",
+  "pages": 983,
+  "positive_snippets": 2935,
+  "negative_snippets": 2948,
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "cpu": {
+    "lscpu": [
+      {
+        "field": "Architecture:",
+        "data": "x86_64"
+      },
+      {
+        "field": "CPU op-mode(s):",
+        "data": "32-bit, 64-bit"
+      },
+      {
+        "field": "Address sizes:",
+        "data": "48 bits physical, 48 bits virtual"
+      },
+      {
+        "field": "Byte Order:",
+        "data": "Little Endian"
+      },
+      {
+        "field": "CPU(s):",
+        "data": "16"
+      },
+      {
+        "field": "On-line CPU(s) list:",
+        "data": "0-15"
+      },
+      {
+        "field": "Vendor ID:",
+        "data": "AuthenticAMD"
+      },
+      {
+        "field": "Model name:",
+        "data": "AMD Ryzen AI 7 PRO 350 w/ Radeon 860M"
+      },
+      {
+        "field": "CPU family:",
+        "data": "26"
+      },
+      {
+        "field": "Model:",
+        "data": "96"
+      },
+      {
+        "field": "Thread(s) per core:",
+        "data": "2"
+      },
+      {
+        "field": "Core(s) per socket:",
+        "data": "8"
+      },
+      {
+        "field": "Socket(s):",
+        "data": "1"
+      },
+      {
+        "field": "Stepping:",
+        "data": "0"
+      },
+      {
+        "field": "BogoMIPS:",
+        "data": "3992.33"
+      },
+      {
+        "field": "Flags:",
+        "data": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect"
+      },
+      {
+        "field": "Virtualization:",
+        "data": "AMD-V"
+      },
+      {
+        "field": "Hypervisor vendor:",
+        "data": "Microsoft"
+      },
+      {
+        "field": "Virtualization type:",
+        "data": "full"
+      },
+      {
+        "field": "L1d cache:",
+        "data": "384 KiB (8 instances)"
+      },
+      {
+        "field": "L1i cache:",
+        "data": "256 KiB (8 instances)"
+      },
+      {
+        "field": "L2 cache:",
+        "data": "8 MiB (8 instances)"
+      },
+      {
+        "field": "L3 cache:",
+        "data": "16 MiB (1 instance)"
+      },
+      {
+        "field": "NUMA node(s):",
+        "data": "1"
+      },
+      {
+        "field": "NUMA node0 CPU(s):",
+        "data": "0-15"
+      },
+      {
+        "field": "Vulnerability Gather data sampling:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Ghostwrite:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Indirect target selection:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Itlb multihit:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability L1tf:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Mds:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Meltdown:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Mmio stale data:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Old microcode:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Reg file data sampling:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Retbleed:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Spec rstack overflow:",
+        "data": "Vulnerable: Safe RET, no microcode"
+      },
+      {
+        "field": "Vulnerability Spec store bypass:",
+        "data": "Mitigation; Speculative Store Bypass disabled via prctl"
+      },
+      {
+        "field": "Vulnerability Spectre v1:",
+        "data": "Mitigation; usercopy/swapgs barriers and __user pointer sanitization"
+      },
+      {
+        "field": "Vulnerability Spectre v2:",
+        "data": "Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected"
+      },
+      {
+        "field": "Vulnerability Srbds:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Tsa:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Tsx async abort:",
+        "data": "Not affected"
+      },
+      {
+        "field": "Vulnerability Vmscape:",
+        "data": "Not affected"
+      }
+    ]
+  },
+  "go_version": "go version go1.27.1 linux/amd64",
+  "rust_version": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "source_sha256": {
+    "src/converter.rs": "471fbbf6be42ab12e71709675caa05883928487ae0cc8b24424faf3f8711ef58",
+    "src/dom.rs": "15f68df6f25ea76fc8c09232646916de881ec5c7e22c7065ff446aa80d5af002",
+    "src/domutil.rs": "d048325b8ac9828ff4b3c57eff7f7aede01381ae696e9636a45a67867ef41923",
+    "src/embed.rs": "5fe38e452e442041834b0f4b9f057de299b854fa1f673137d5d8cd2c6b9efc20",
+    "src/encoding/decoder.rs": "c824ff47089cd30b307983ca9b8112595e20775549db31d56f64c2f471e98110",
+    "src/encoding/tables.rs": "6d445b77680af310e7f4cc9486d1a53176f619692238d1e87b63bf02becabad2",
+    "src/encoding.rs": "04b55f4ee11fe44a0aafcdb3362d2987e0bc5307bae5f814a2f6f192a0607585",
+    "src/extraction.rs": "b25b31528d9001aa3c7281c261b8b1ff0a479dac68a8d0b5747a94a4653791ff",
+    "src/filter.rs": "17e3be8d34728ef97987584871020ecdaa7f003ba856e74b0730c22d5eb0d9aa",
+    "src/label.rs": "03cd07da0456378272d8d23e673c2a816c7d17ad52eb5c7707259788237749f0",
+    "src/lib.rs": "6b1057d987519b7672fa82ae7ddadcfccd8a446ad9dd58b5b3986d91ab0cbb9a",
+    "src/markup/schema.rs": "772adf15ed8f13f965bc59ca839af497f113b185256e43aba4afac3222118dd3",
+    "src/markup.rs": "8fb422d0e61fd38bfacccec0d9a29a300534bb6e73860c7263e09b141561708d",
+    "src/pagination/number.rs": "6a15c5c06d8a87f3a45789d4c263c31f68560e5eefe1c50b033832ab80b06f23",
+    "src/pagination/pattern.rs": "efb3efa60dc748c5598442925d4da75d4d0d58a91bfa3f681c4efab952f8994d",
+    "src/pagination.rs": "cf413c223cfcce6248296958cab508f1881c781bfc1f75144f901656b3062dac",
+    "src/stringutil.rs": "fe9db1ae9959dd92cae5e18887bb0696042aede1bee22a91e0756bf781b45ffc",
+    "src/table.rs": "1b6842c167c09892f05971ce43696d46d7936f73c7013de8759e622deb99b3c6",
+    "src/upstream_tests.rs": "f20f4c3c956bcca74c66b0d102a3ebafb4967b4e5bce4f682119b3b748270db4",
+    "src/urlutil.rs": "d3102dfdef2f626e9e498d281e8131e4eb9b78bb2870473ca524817db5ca1c76",
+    "src/webdoc.rs": "81220402470d09082cbb505f0c981d0614f3482e86aa0742cea4f959d8481a2e",
+    "tools/go-reference/benchmark.go": "fb4e28794e1f7205bf5a5b5f77905bc8f29cba1247d7a7355558a25fa4f18970",
+    "tools/go-reference/benchmark_test.go": "ec03a0fc04b1829496f31fa264a59e3d13f0ad399cdd9adea0ca6a19e5fe03b7",
+    "tools/go-reference/dom.go": "bc0f1d49f3168dd92c1c4d01477404f0720b7e66025724691ed78671bed34786",
+    "tools/go-reference/encoding.go": "887ca9cb78ebd9b5bcec7273a9c85f874dd5277b07ad750f93edeb395b83c409",
+    "tools/go-reference/extraction.go": "c1dda2614238a15b98036218fe2cb5eec8274c51a510dbb6d100da7d5988ef7d",
+    "tools/go-reference/filters.go": "b372154f23476b77dbc4cf9beb71568953de89f78ea09b3d2b117efc78e8de5a",
+    "tools/go-reference/main.go": "48642f390bd75420aafacb083dea9df4f3e426f9cf089e02ad72e7c3e749d1dc",
+    "tools/go-reference/markup.go": "2bb2e53b26aa30f0f9d04cfa21c5450a8c26adb0aad9de0fc64f985530dd6cd2",
+    "tools/go-reference/pagination.go": "6107cd4dcb134a0b403c4014e49ac5e8db8c0b256d9106bd618ea2c5ac51075a",
+    "tools/go-reference/provenance.go": "9dd718c04b46ea04140b7fb8fb0af664b717604cf5ce9177f2ad712543dd407e",
+    "tools/go-reference/url.go": "87cfd1edc366fdb9613c735d83ebcafffce179c7b495101f98b8d1dfb8e14007",
+    "Cargo.toml": "c1c439ffe879d1282f56ec0cc0248dcd87434f2419bf595c839c26a0b68afb31",
+    "Cargo.lock": "a36c9004d6b1562e942621763175dfcfce550cc6b168164435c481e94ab3be52",
+    "examples/benchmark.rs": "7c8594d9246a4ead088bcaf14e74df92434cea65a91452ad42aa0ece6e074abb",
+    "tools/benchmark.py": "ba3d9b4a92dfbebcebb3c4a733ae956695b2ecda6f5ca08a7531281ca6926e7a",
+    "tools/go-reference/go.mod": "e2c1f591ac3acb3ba8d98165d1ab7376e1f30c055f8bcf500628301d7d7cef2f",
+    "tools/go-reference/go.sum": "42ceaea9bb40db4b6e46f3ae8a33808ab1c70c9e2b2f1392b71bea9b31a56477"
+  },
+  "binary_sha256": {
+    "go": "c8c820f22465afcebe59ec0a7de84ed6d76bdd178a0adf6e491267ec7210216b",
+    "rust": "3177d8227bb9b59e72f2cd8ce7e9983637e157126c5fa483c02bd72bda0369d3"
+  },
+  "affinity": [
+    2
+  ],
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "warmups": 2,
+  "samples": 10,
+  "timing_scope": "pre-parsed DOM extraction and case-sensitive snippet scoring; excludes I/O, decoding, parsing, JSON and HTML serialization",
+  "modes": {
+    "skip": {
+      "quality": {
+        "go": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        },
+        "rust": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        }
+      },
+      "samples": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4657761327,
+          "rust": 1701267763
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1387693984,
+          "go": 4187043937
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5063642016,
+          "rust": 1529433713
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1470238689,
+          "go": 4198231906
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4220409430,
+          "rust": 1491304879
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1418532516,
+          "go": 5171450482
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4113424150,
+          "rust": 1438267535
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1362418508,
+          "go": 4363301577
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4050372993,
+          "rust": 1596703858
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1377981619,
+          "go": 4648771995
+        }
+      ],
+      "warmups": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4107477414,
+          "rust": 1763434253
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1559113991,
+          "go": 5224457899
+        }
+      ],
+      "differences": [
+        {
+          "file": "harrypotter.fandom.com.spell.html",
+          "fields": [
+            "html"
+          ]
+        }
+      ],
+      "exact_pages": 982,
+      "median_ms": {
+        "go": 4291.8555035,
+        "rust": 1454.253112
+      },
+      "range_ms": {
+        "go": [
+          4050.372993,
+          5171.450482
+        ],
+        "rust": [
+          1362.418508,
+          1701.267763
+        ]
+      },
+      "speedup": 2.951243815870204
+    },
+    "prev-next": {
+      "quality": {
+        "go": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        },
+        "rust": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        }
+      },
+      "samples": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5399227040,
+          "rust": 1882098605
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1866673842,
+          "go": 5314950704
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5181756330,
+          "rust": 1913027705
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 2170544143,
+          "go": 5899616592
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5869891110,
+          "rust": 1875492236
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1829539242,
+          "go": 5429103494
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5179433041,
+          "rust": 2118493435
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1845083920,
+          "go": 5066078324
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5281332390,
+          "rust": 1955390862
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1917321783,
+          "go": 5315303217
+        }
+      ],
+      "warmups": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 5900625641,
+          "rust": 2210768203
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1903734532,
+          "go": 5737677195
+        }
+      ],
+      "differences": [
+        {
+          "file": "archive.modabot.de.serkan.html",
+          "fields": [
+            "prev_page"
+          ]
+        },
+        {
+          "file": "harrypotter.fandom.com.spell.html",
+          "fields": [
+            "html"
+          ]
+        }
+      ],
+      "exact_pages": 981,
+      "median_ms": {
+        "go": 5315.1269605,
+        "rust": 1897.563155
+      },
+      "range_ms": {
+        "go": [
+          5066.078324,
+          5899.616592
+        ],
+        "rust": [
+          1829.539242,
+          2170.544143
+        ]
+      },
+      "speedup": 2.801027700445627
+    },
+    "page-number": {
+      "quality": {
+        "go": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        },
+        "rust": {
+          "counts": {
+            "true_positives": 2535,
+            "false_negatives": 400,
+            "false_positives": 375,
+            "true_negatives": 2573
+          },
+          "precision": 0.8711340206185567,
+          "recall": 0.8637137989778535,
+          "accuracy": 0.8682644909060003,
+          "f1": 0.8674080410607357
+        }
+      },
+      "samples": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4484776439,
+          "rust": 2204167201
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1574019223,
+          "go": 4341413828
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4318106166,
+          "rust": 1513688411
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1799046634,
+          "go": 4858373925
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4310905682,
+          "rust": 1602242998
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1593990191,
+          "go": 4924947194
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4342679981,
+          "rust": 1756295867
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1493022843,
+          "go": 4560822338
+        },
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4323691745,
+          "rust": 1530937947
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 1612990554,
+          "go": 4427696914
+        }
+      ],
+      "warmups": [
+        {
+          "order": [
+            "go",
+            "rust"
+          ],
+          "go": 4761470685,
+          "rust": 1669656073
+        },
+        {
+          "order": [
+            "rust",
+            "go"
+          ],
+          "rust": 2104573339,
+          "go": 4866473329
+        }
+      ],
+      "differences": [
+        {
+          "file": "harrypotter.fandom.com.spell.html",
+          "fields": [
+            "html"
+          ]
+        }
+      ],
+      "exact_pages": 982,
+      "median_ms": {
+        "go": 4385.1884475,
+        "rust": 1598.1165945
+      },
+      "range_ms": {
+        "go": [
+          4310.905682,
+          4924.947194
+        ],
+        "rust": [
+          1493.022843,
+          2204.167201
+        ]
+      },
+      "speedup": 2.7439727880880844
+    }
+  }
+}

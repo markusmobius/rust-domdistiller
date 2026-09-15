@@ -1,0 +1,13 @@
+* text=auto
+*.rs text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.go text eol=lf
+Cargo.lock text eol=lf
+tools/go-reference/go.mod text eol=lf
+tools/go-reference/go.sum text eol=lf
+LICENSE -text
+NOTICE text eol=lf
+licenses/** -text whitespace=cr-at-eol
+testdata/** -text whitespace=cr-at-eol
