@@ -70,7 +70,7 @@ fn provenance_matches_retained_artifacts() {
             "{:x}",
             Sha256::digest(include_bytes!("../testdata/go-reference.json"))
         ),
-        "4ae82b0de7db0c6459a138d8dbb3d139951bb3294d1318e5220c86b46fffc6e4"
+        "449b416673d1ed5d16ace9fa750280e835e7f9b95c8bee37c11bd675bbeb0f44"
     );
     let fixture: serde_json::Value =
         serde_json::from_str(include_str!("../testdata/go-reference.json")).unwrap();
@@ -133,6 +133,7 @@ struct Fixture {
     classifiers: Vec<ClassifierCase>,
     filters: Vec<FilterCase>,
     dom: Vec<DomCase>,
+    attributes: Vec<AttributeCase>,
     converters: Vec<ConverterCase>,
     siblings: Vec<SiblingCase>,
     tables: Vec<TableCase>,
@@ -192,7 +193,7 @@ struct PublicCase {
 fn pinned_go_public_parity() {
     let fixture: Fixture =
         serde_json::from_str(include_str!("../testdata/go-reference.json")).unwrap();
-    assert_eq!(fixture.public.len(), 168);
+    assert_eq!(fixture.public.len(), 180);
     for (index, case) in fixture.public.into_iter().enumerate() {
         let options = crate::Options {
             original_url: Some(case.input_url),
@@ -375,7 +376,7 @@ struct PaginationCase {
 fn pinned_go_pagination_parity() {
     let fixture: Fixture =
         serde_json::from_str(include_str!("../testdata/go-reference.json")).unwrap();
-    assert_eq!(fixture.pagination.len(), 1995);
+    assert_eq!(fixture.pagination.len(), 2139);
     for (index, case) in fixture.pagination.into_iter().enumerate() {
         let document = crate::Document::parse(&case.html);
         let root = document.tagged(0, "html")[0];
@@ -745,6 +746,121 @@ struct DomNode {
     tag: String,
     display: String,
     visible: bool,
+}
+
+#[derive(Deserialize)]
+struct AttributeSnapshot {
+    namespace: String,
+    key: String,
+    value: String,
+}
+
+#[derive(Deserialize)]
+struct AttributeCase {
+    input: String,
+    tag: String,
+    key: String,
+    qualified_key: String,
+    attributes: Vec<AttributeSnapshot>,
+    html: String,
+    value: String,
+    has: bool,
+    qualified_value: String,
+    qualified_has: bool,
+    set_html: String,
+    remove_html: String,
+    absolute_html: String,
+    stripped_html: String,
+}
+
+#[test]
+fn pinned_go_attribute_parity() {
+    let fixture: Fixture =
+        serde_json::from_str(include_str!("../testdata/go-reference.json")).unwrap();
+    assert_eq!(fixture.attributes.len(), 360);
+    for (index, case) in fixture.attributes.into_iter().enumerate() {
+        let mut document = crate::Document::parse(&case.input);
+        let root = document.tagged(0, &case.tag)[0];
+        let attributes = case
+            .attributes
+            .into_iter()
+            .map(|attribute| crate::dom::Attribute {
+                namespace: attribute.namespace,
+                key: attribute.key,
+                value: attribute.value,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            document.nodes[root].attrs, attributes,
+            "attributes case {index}: {}",
+            case.input
+        );
+        assert_eq!(
+            document.outer_html(root),
+            case.html,
+            "HTML case {index}: {}",
+            case.input
+        );
+        assert_eq!(
+            document.nodes[root].attr(&case.key),
+            case.value,
+            "value case {index}: {}",
+            case.input
+        );
+        assert_eq!(
+            document.nodes[root].has_attr(&case.key),
+            case.has,
+            "has case {index}: {}",
+            case.input
+        );
+        assert_eq!(
+            document.nodes[root].attr(&case.qualified_key),
+            case.qualified_value,
+            "qualified value case {index}: {}",
+            case.input
+        );
+        assert_eq!(
+            document.nodes[root].has_attr(&case.qualified_key),
+            case.qualified_has,
+            "qualified has case {index}: {}",
+            case.input
+        );
+        let mut processed = crate::Document { nodes: Vec::new() };
+        processed.import_tree(&document, root);
+        document.nodes[root].set_attr(&case.key, "updated");
+        assert_eq!(
+            document.outer_html(root),
+            case.set_html,
+            "set case {index}: {}",
+            case.input
+        );
+        document.nodes[root].remove_attr(&case.key);
+        assert_eq!(
+            document.outer_html(root),
+            case.remove_html,
+            "remove case {index}: {}",
+            case.input
+        );
+        crate::domutil::make_absolute(
+            &mut processed,
+            0,
+            Some("https://example.com/news/story.html"),
+            true,
+        );
+        assert_eq!(
+            processed.to_html(),
+            case.absolute_html,
+            "absolute case {index}: {}",
+            case.input
+        );
+        crate::domutil::strip_attributes(&mut processed, 0);
+        assert_eq!(
+            processed.to_html(),
+            case.stripped_html,
+            "stripped case {index}: {}",
+            case.input
+        );
+    }
 }
 
 #[test]

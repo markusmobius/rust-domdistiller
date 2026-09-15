@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -64,6 +65,88 @@ func domCases() []domCase {
 			current.Nodes = append(current.Nodes, domNode{dom.TagName(node), domutil.GetDisplayStyle(node), domutil.IsProbablyVisible(node)})
 		}
 		cases = append(cases, current)
+	}
+	return cases
+}
+
+type attributeSnapshot struct {
+	Namespace string `json:"namespace"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+}
+
+type attributeCase struct {
+	Input          string              `json:"input"`
+	Tag            string              `json:"tag"`
+	Key            string              `json:"key"`
+	QualifiedKey   string              `json:"qualified_key"`
+	Attributes     []attributeSnapshot `json:"attributes"`
+	HTML           string              `json:"html"`
+	Value          string              `json:"value"`
+	Has            bool                `json:"has"`
+	QualifiedValue string              `json:"qualified_value"`
+	QualifiedHas   bool                `json:"qualified_has"`
+	SetHTML        string              `json:"set_html"`
+	RemoveHTML     string              `json:"remove_html"`
+	AbsoluteHTML   string              `json:"absolute_html"`
+	StrippedHTML   string              `json:"stripped_html"`
+}
+
+func attributeCases() []attributeCase {
+	wrappers := []struct{ html, tag string }{
+		{"<a %s>link</a>", "a"},
+		{"<svg><a %s>link</a></svg>", "a"},
+		{"<svg><use %s></use></svg>", "use"},
+		{"<math><mi %s>value</mi></math>", "mi"},
+		{"<svg><foreignObject><a %s>HTML</a></foreignObject></svg>", "a"},
+		{"<svg><title><a %s>HTML</a></title></svg>", "a"},
+		{"<math><mtext><a %s>HTML</a></mtext></math>", "a"},
+		{"<math><annotation-xml encoding='text/html'><a %s>HTML</a></annotation-xml></math>", "a"},
+	}
+	pageURL, _ := url.Parse("https://example.com/news/story.html")
+	cases := []attributeCase{}
+	for _, wrapper := range wrappers {
+		for _, qualified := range []string{
+			"xlink:actuate", "xlink:arcrole", "xlink:href", "xlink:role", "xlink:show",
+			"xlink:title", "xlink:type", "xml:base", "xml:lang", "xml:space",
+			"xmlns:xlink", "xmlns", "custom:href", "XLINK:HREF", "href",
+		} {
+			key := strings.ToLower(qualified)
+			if _, local, found := strings.Cut(key, ":"); found {
+				key = local
+			}
+			foreign := qualified + "='../first?x=1&amp;y=2'"
+			plain := key + "='second'"
+			for _, attributes := range []string{foreign, foreign + " " + plain + " " + foreign, plain + " " + foreign + " " + foreign} {
+				input := fmt.Sprintf(wrapper.html, attributes+" data-extra='removed' id='removed'")
+				parsed, err := dom.Parse(strings.NewReader(input))
+				if err != nil {
+					panic(err)
+				}
+				node := dom.GetElementsByTagName(parsed, wrapper.tag)[0]
+				cloned := dom.Clone(node, true)
+				current := attributeCase{
+					Input: input, Tag: wrapper.tag, Key: key, QualifiedKey: strings.ToLower(qualified),
+					Attributes: []attributeSnapshot{}, HTML: dom.OuterHTML(cloned),
+					Value: dom.GetAttribute(cloned, key), Has: dom.HasAttribute(cloned, key),
+					QualifiedValue: dom.GetAttribute(cloned, strings.ToLower(qualified)),
+					QualifiedHas:   dom.HasAttribute(cloned, strings.ToLower(qualified)),
+				}
+				for _, attribute := range cloned.Attr {
+					current.Attributes = append(current.Attributes, attributeSnapshot{attribute.Namespace, attribute.Key, attribute.Val})
+				}
+				dom.SetAttribute(cloned, key, "updated")
+				current.SetHTML = dom.OuterHTML(cloned)
+				dom.RemoveAttribute(cloned, key)
+				current.RemoveHTML = dom.OuterHTML(cloned)
+				processed := dom.Clone(node, true)
+				domutil.MakeAllLinksAbsolute(processed, pageURL)
+				current.AbsoluteHTML = dom.OuterHTML(processed)
+				domutil.StripAttributes(processed)
+				current.StrippedHTML = dom.OuterHTML(processed)
+				cases = append(cases, current)
+			}
+		}
 	}
 	return cases
 }

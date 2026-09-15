@@ -11,11 +11,11 @@ network access, or internal worker threads. Callers own fetching and concurrency
 
 ## Usage
 
-From a local checkout, use a path dependency:
+Add the crate to your project:
 
 ```toml
 [dependencies]
-rust-domdistiller = { path = "../rust-domdistiller" }
+rust-domdistiller = "1.0.0"
 ```
 
 ```rust
@@ -44,8 +44,10 @@ stderr:
 cargo run --locked --release --example distill -- article.html https://example.com/news/story
 ```
 
-Rust 1.98.1 is pinned for repository builds. This implementation has not been
-published to crates.io or tagged as a release.
+Rust 1.98.1 is the minimum supported version and is pinned for repository builds.
+Version 1.0.0 uses the Go revision documented below, also released as
+Go-DomDistiller v1.0.0. The checked-in benchmark compares this extraction code
+against that same Go implementation; the release version changes no algorithms.
 
 ## API
 
@@ -75,6 +77,13 @@ an immutable document. DOM conversion uses a private copy, including the second
 extraction attempt below Go's 500-word threshold. If modifying the public node
 arena directly, keep its parent/child indices valid and acyclic.
 
+`Node.attrs` is `Vec<dom::Attribute>`, with `namespace`, `key`, and `value` fields,
+replacing the earlier `(String, String)` tuples. Attribute helpers match Go's
+first local-key occurrence; setting a value preserves its namespace, and removing
+it exposes the next matching key. For example, an SVG `xlink:href` has namespace
+`"xlink"` and key `"href"`, while an ordinary HTML `xlink:href` remains a literal
+key. The `attr`, `has_attr`, `set_attr`, and `remove_attr` signatures are unchanged.
+
 ## Compatibility
 
 The reference is Go-DomDistiller
@@ -83,26 +92,32 @@ The reference is Go-DomDistiller
 dependencies. This follows that Go revision, not Chromium's original Java
 implementation or Go-DomDistiller's separate stable branch.
 
-The offline corpus contains **44,012 Go-generated cases** covering word counters,
+**Go behavioral parity is the requirement, not just parity on tested cases.**
+Deterministic differences are compatibility bugs, including on malformed HTML,
+foreign content, unusual URLs, and inputs not yet covered by the suite. Tests
+provide evidence of compatibility; they do not limit the supported input domain.
+
+The offline corpus contains **44,528 Go-generated cases** covering word counters,
 block classifiers and filters, DOM conversion, tables/media, metadata, both
 pagination algorithms, URLs, charset scores, byte decoding, and full extraction.
 It includes the upstream saved HTML page in all four pagination/skip settings.
 Full results compare exact HTML, text, image order, metadata, title, word count,
-and pagination. These are regression cases, not 44,012 independent web pages.
+and pagination. These are regression cases, not 44,528 independent web pages.
 
-Important boundaries:
+Parsing uses third-party html5gum and html5ever with a local Go-compatibility
+adapter. Attribute namespaces, local keys, duplicates, and order are preserved
+according to Go's rules. Go's extraction clones also omit element namespaces;
+that is distinct from attribute namespaces, which both implementations retain.
+
+Nondeterminism and API scope:
 
 - Go's charset detector races equal-confidence recognizers. Rust uses a fixed
   recognition order with the same scores and creates no threads. A different
   winner is possible on genuinely ambiguous inputs. Saved reader cases assert
   that tied winners decode identically; non-equivalent ties are not waived.
 - Go's numbered-pagination candidate map can break equal-ranked ties in map
-  iteration order. Rust uses stable key ordering. Ambiguous tied candidates are
-  not claimed universally equivalent.
-- The HTML5 parser is qualified on the checked-in cases and saved page, not all
-  malformed HTML. The arena does not preserve element namespaces. Arbitrary
-  invalid UTF-8 URL paths, newer Unicode case/normalization data, and extreme
-  nesting remain qualification boundaries.
+  iteration order. Rust uses stable key ordering. Go itself has no fixed winner
+  for those ties; candidate and ranking semantics must still match.
 - There is no computed CSS, JavaScript execution, fetching, or browser layout,
   consistent with the server-side Go engine. Go's `ApplyForURL`, `LogFlags`,
   logging output, and detailed parser timing entries are not ported.
@@ -125,14 +140,14 @@ produced the same counts: TP 2,535, FN 400, FP 375, TN 2,573.
 | Go-DomDistiller | 0.871 | 0.864 | 0.867 |
 | Rust-DomDistiller | 0.871 | 0.864 | 0.867 |
 
-Median elapsed time per complete 983-page pass, comparing Go with the final Rust
-implementation on 2026-09-15:
+Median elapsed time per complete 983-page pass, comparing Go with the corrected
+Rust implementation on 2026-09-15:
 
 | Pagination | Go | Rust | Go Time / Rust Time |
 | --- | ---: | ---: | ---: |
-| Skipped | 4,292 ms | 1,454 ms | 2.95x |
-| Previous/next | 5,315 ms | 1,898 ms | 2.80x |
-| Page number | 4,385 ms | 1,598 ms | 2.74x |
+| Skipped | 4,180 ms | 1,374 ms | 3.04x |
+| Previous/next | 5,345 ms | 1,891 ms | 2.83x |
+| Page number | 4,241 ms | 1,474 ms | 2.88x |
 
 These measurements use Go 1.27.1 and Rust 1.98.1 release builds on an AMD Ryzen AI
 7 PRO 350 under Linux/WSL2, pinned to one logical CPU. Each engine received two
@@ -142,12 +157,12 @@ I/O, charset decoding, initial parsing, IPC, and extra caller-side HTML
 serialization are excluded. Extraction's own output generation remains included.
 This is not an end-to-end file or network benchmark, and timings vary by machine.
 
-Text, title, and word count match exactly on all 983 pages in every setting.
-One page has an HTML-only difference; previous/next mode also has one previous-page
-URL difference. Thus all six compared fields match on 982/983 pages with
-pagination skipped or numbered, and 981/983 with previous/next detection. Metadata
-and image lists are not compared by this separate benchmark. The exact exceptions,
-sample ranges, raw measurements, and reproduction commands are in
+All six compared fields match exactly on **983/983 pages in every setting**:
+text, title, word count, HTML, next-page URL, and previous-page URL. The former SVG
+attribute and archived-page pagination differences are fixed at their underlying
+rules. The comparison runner fails on any output mismatch, even when snippet
+scores agree. Metadata and image lists are checked separately by the differential
+fixtures. Sample ranges, raw measurements, and reproduction commands are in
 [UPSTREAM.md](UPSTREAM.md#corpus-benchmark).
 
 ## Verification
@@ -178,7 +193,7 @@ not evidence of platform support.
 
 The original Go suite passes all packages (383 test functions in 47 files).
 Rust also runs 22 directly translated upstream document-title scenarios, alongside
-the 44,012 Go-generated regression cases. This is not a literal translation of
+the 44,528 Go-generated regression cases. This is not a literal translation of
 all 383 Go test functions. The separate labeled-page benchmark above reuses the
 complete upstream manifest and scoring rules; its source-checkout runner is
 [tools/benchmark.py](tools/benchmark.py).

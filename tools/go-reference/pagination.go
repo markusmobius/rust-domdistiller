@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/url"
+	"path"
 	"sort"
 	"strings"
 
@@ -81,6 +82,36 @@ func paginationCases() []paginationCase {
 					prevNext := pagination.NewPrevNextFinder(nil).FindPagination(dom.DocumentElement(parsed), page)
 					number := pagination.NewPageNumberFinder(stringutil.SelectWordCounter(dom.TextContent(parsed)), nil, nil).FindPagination(dom.DocumentElement(parsed), page)
 					cases = append(cases, paginationCase{input.String(), pageURL, prevNext, number})
+				}
+			}
+		}
+	}
+	for _, pagePath := range []string{
+		"/news/story2", "/news//story2", "/news///story2", "/news/./story2",
+		"/news/archive/../story2", "/news/../../story2", "//story2", "/./story2",
+		"/web/20190717140047/http://example.com/story2", "/news/%2F/story2",
+		"/news/%2e%2e/story2", "/news/story2/",
+	} {
+		pageURL := "https://example.com" + pagePath
+		page, err := url.Parse(pageURL)
+		if err != nil {
+			panic(err)
+		}
+		unclean := strings.TrimSuffix(page.Path, "/")
+		unclean = unclean[:strings.LastIndex(unclean, "/")+1]
+		clean := strings.TrimSuffix(path.Dir(strings.TrimSuffix(page.Path, "/")), "/")
+		for _, folder := range []string{strings.TrimSuffix(unclean, "/"), clean} {
+			for _, parent := range []string{"", "pagination", "footer"} {
+				for _, text := range []string{"Previous", "Next"} {
+					input := fmt.Sprintf("<div class='%s'><a href='https://example.com%s/page/3'>%s</a></div>", parent, folder, text)
+					parsed, err := dom.Parse(strings.NewReader(input))
+					if err != nil {
+						panic(err)
+					}
+					root := dom.DocumentElement(parsed)
+					prevNext := pagination.NewPrevNextFinder(nil).FindPagination(root, page)
+					number := pagination.NewPageNumberFinder(stringutil.SelectWordCounter(dom.TextContent(parsed)), nil, nil).FindPagination(root, page)
+					cases = append(cases, paginationCase{input, pageURL, prevNext, number})
 				}
 			}
 		}

@@ -11,9 +11,10 @@ pub(crate) fn strip_attributes(document: &mut Document, root: NodeId) {
     for index in indices {
         let node = &mut document.nodes[index];
         let allow_size = matches!(node.tag.as_str(), "table" | "th" | "td" | "hr" | "pre");
-        node.attrs.retain(|(name, _)| {
+        node.attrs.retain(|attribute| {
+            let name = attribute.key.as_str();
             !matches!(
-                name.as_str(),
+                name,
                 "id" | "class"
                     | "align"
                     | "background"
@@ -27,7 +28,7 @@ pub(crate) fn strip_attributes(document: &mut Document, root: NodeId) {
                     | "style"
                     | "valign"
                     | "vspace"
-            ) && (allow_size || !matches!(name.as_str(), "width" | "height"))
+            ) && (allow_size || !matches!(name, "width" | "height"))
                 && ALLOWED_ATTRIBUTES
                     .split_ascii_whitespace()
                     .any(|allowed| allowed == name)

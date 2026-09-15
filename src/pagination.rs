@@ -67,10 +67,29 @@ fn clean_url(url: &Url) -> (String, String) {
 }
 
 fn directory(path: &str) -> String {
-    let directory = path
-        .rfind('/')
-        .map_or(".", |index| if index == 0 { "/" } else { &path[..index] });
-    directory.strip_suffix('/').unwrap_or(directory).into()
+    let directory = &path[..path.rfind('/').map_or(0, |index| index + 1)];
+    let rooted = directory.starts_with('/');
+    let mut components = Vec::new();
+    for component in directory.split('/') {
+        match component {
+            "" | "." => {}
+            ".." => {
+                if components.last().is_some_and(|last| *last != "..") {
+                    components.pop();
+                } else if !rooted {
+                    components.push(component);
+                }
+            }
+            _ => components.push(component),
+        }
+    }
+    if rooted && !components.is_empty() {
+        format!("/{}", components.join("/"))
+    } else if !rooted && components.is_empty() {
+        ".".into()
+    } else {
+        components.join("/")
+    }
 }
 
 fn page_diff(current: &str, link: &str, skip: usize) -> Option<i64> {
@@ -263,5 +282,32 @@ fn find_outlinks(
     PaginationInfo {
         prev_page,
         next_page,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::directory;
+
+    #[test]
+    fn pagination_directory_matches_go_path_cleaning() {
+        for (path, expected) in [
+            ("", "."),
+            ("story", "."),
+            ("/", ""),
+            ("///story", ""),
+            ("/news/story", "/news"),
+            ("/news//archive/./story", "/news/archive"),
+            ("/news/archive/../story", "/news"),
+            ("/../../story", ""),
+            ("../news/story", "../news"),
+            ("news/../../story", ".."),
+            (
+                "/web/20190717140047/http://example.com/story",
+                "/web/20190717140047/http:/example.com",
+            ),
+        ] {
+            assert_eq!(directory(path), expected, "{path:?}");
+        }
     }
 }

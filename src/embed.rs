@@ -292,8 +292,12 @@ fn replace_lazy(document: &mut Document, root: NodeId) {
             source = value.into();
         }
         if source.is_empty() {
-            if let Some((_, value)) = node.attrs.iter().find(|(_, value)| SOURCE.is_match(value)) {
-                source = value.clone();
+            if let Some(attribute) = node
+                .attrs
+                .iter()
+                .find(|attribute| SOURCE.is_match(&attribute.value))
+            {
+                source = attribute.value.clone();
             }
         }
         if !source.is_empty() {
@@ -309,10 +313,12 @@ fn replace_lazy(document: &mut Document, root: NodeId) {
                 srcset = value.into();
             }
             if srcset.is_empty() {
-                if let Some((_, value)) =
-                    node.attrs.iter().find(|(_, value)| SRCSET.is_match(value))
+                if let Some(attribute) = node
+                    .attrs
+                    .iter()
+                    .find(|attribute| SRCSET.is_match(&attribute.value))
                 {
-                    srcset = value.clone();
+                    srcset = attribute.value.clone();
                 }
             }
             if !srcset.is_empty() {

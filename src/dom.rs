@@ -12,12 +12,19 @@ pub enum Kind {
     Doctype,
 }
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct Attribute {
+    pub namespace: String,
+    pub key: String,
+    pub value: String,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Node {
     pub kind: Kind,
     pub tag: String,
     pub data: String,
-    pub attrs: Vec<(String, String)>,
+    pub attrs: Vec<Attribute>,
     pub parent: Option<NodeId>,
     pub children: Vec<NodeId>,
 }
@@ -26,24 +33,36 @@ impl Node {
     pub fn attr(&self, name: &str) -> &str {
         self.attrs
             .iter()
-            .find(|(key, _)| key == name)
-            .map_or("", |(_, value)| value)
+            .find(|attribute| attribute.key == name)
+            .map_or("", |attribute| &attribute.value)
     }
 
     pub fn has_attr(&self, name: &str) -> bool {
-        self.attrs.iter().any(|(key, _)| key == name)
+        self.attrs.iter().any(|attribute| attribute.key == name)
     }
 
     pub fn set_attr(&mut self, name: &str, value: &str) {
-        if let Some((_, current)) = self.attrs.iter_mut().find(|(key, _)| key == name) {
-            *current = value.into();
+        if let Some(attribute) = self
+            .attrs
+            .iter_mut()
+            .find(|attribute| attribute.key == name)
+        {
+            attribute.value = value.into();
         } else {
-            self.attrs.push((name.into(), value.into()));
+            self.attrs.push(Attribute {
+                namespace: String::new(),
+                key: name.into(),
+                value: value.into(),
+            });
         }
     }
 
     pub fn remove_attr(&mut self, name: &str) {
-        if let Some(index) = self.attrs.iter().position(|(key, _)| key == name) {
+        if let Some(index) = self
+            .attrs
+            .iter()
+            .position(|attribute| attribute.key == name)
+        {
             self.attrs.remove(index);
         }
     }
@@ -103,11 +122,41 @@ impl Document {
                         .borrow()
                         .iter()
                         .map(|attribute| {
-                            let key = attribute.name.prefix.as_ref().map_or_else(
-                                || attribute.name.local.to_string(),
-                                |prefix| format!("{prefix}:{}", attribute.name.local),
-                            );
-                            (key, attribute.value.to_string())
+                            let qualified = attribute
+                                .name
+                                .prefix
+                                .as_ref()
+                                .filter(|prefix| !prefix.is_empty())
+                                .map_or_else(
+                                    || attribute.name.local.to_string(),
+                                    |prefix| format!("{prefix}:{}", attribute.name.local),
+                                );
+                            let (namespace, key) = if matches!(
+                                name.ns.as_ref(),
+                                "http://www.w3.org/2000/svg" | "http://www.w3.org/1998/Math/MathML"
+                            ) && matches!(
+                                qualified.as_str(),
+                                "xlink:actuate"
+                                    | "xlink:arcrole"
+                                    | "xlink:href"
+                                    | "xlink:role"
+                                    | "xlink:show"
+                                    | "xlink:title"
+                                    | "xlink:type"
+                                    | "xml:base"
+                                    | "xml:lang"
+                                    | "xml:space"
+                                    | "xmlns:xlink"
+                            ) {
+                                qualified.split_once(':').unwrap()
+                            } else {
+                                ("", qualified.as_str())
+                            };
+                            Attribute {
+                                namespace: namespace.into(),
+                                key: key.into(),
+                                value: attribute.value.to_string(),
+                            }
                         })
                         .collect();
                     if let Some(template) = template_contents.borrow().as_ref() {
@@ -130,10 +179,18 @@ impl Document {
                     node.kind = Kind::Doctype;
                     node.data = name.to_string();
                     if !public_id.is_empty() {
-                        node.attrs.push(("public".into(), public_id.to_string()));
+                        node.attrs.push(Attribute {
+                            namespace: String::new(),
+                            key: "public".into(),
+                            value: public_id.to_string(),
+                        });
                     }
                     if !system_id.is_empty() {
-                        node.attrs.push(("system".into(), system_id.to_string()));
+                        node.attrs.push(Attribute {
+                            namespace: String::new(),
+                            key: "system".into(),
+                            value: system_id.to_string(),
+                        });
                     }
                 }
                 NodeData::ProcessingInstruction { target, contents } => {
@@ -382,11 +439,15 @@ impl Document {
                 Kind::Element => {
                     output.push('<');
                     output.push_str(&node.tag);
-                    for (key, value) in &node.attrs {
+                    for attribute in &node.attrs {
                         output.push(' ');
-                        output.push_str(key);
+                        if !attribute.namespace.is_empty() {
+                            output.push_str(&attribute.namespace);
+                            output.push(':');
+                        }
+                        output.push_str(&attribute.key);
                         output.push_str("=\"");
-                        escape(value, &mut output);
+                        escape(&attribute.value, &mut output);
                         output.push('"');
                     }
                     if matches!(
@@ -496,6 +557,27 @@ fn quote_doctype(text: &str, output: &mut String) {
 #[cfg(test)]
 mod tests {
     use super::{Document, Kind};
+
+    #[test]
+    fn namespaced_attribute_keys_match_go() {
+        let mut document = Document::parse(
+            "<svg><a xlink:href='foreign' href='plain' xml:lang='fr' lang='en'>link</a></svg><div xlink:href='literal'>text</div>",
+        );
+        let anchor = document.tagged(0, "a")[0];
+        assert_eq!(document.nodes[anchor].attr("href"), "foreign");
+        assert_eq!(document.nodes[anchor].attr("lang"), "fr");
+        assert!(!document.nodes[anchor].has_attr("xlink:href"));
+        document.nodes[anchor].set_attr("href", "updated");
+        assert_eq!(
+            document.outer_html(anchor),
+            "<a xlink:href=\"updated\" href=\"plain\" xml:lang=\"fr\" lang=\"en\">link</a>"
+        );
+        document.nodes[anchor].remove_attr("href");
+        assert_eq!(document.nodes[anchor].attr("href"), "plain");
+        let div = document.tagged(0, "div")[0];
+        assert_eq!(document.nodes[div].attr("xlink:href"), "literal");
+        assert!(!document.nodes[div].has_attr("href"));
+    }
 
     #[test]
     fn replacement_restores_mutations_and_reuses_buffers() {

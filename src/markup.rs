@@ -262,10 +262,11 @@ fn opengraph(document: &Document, root: NodeId) -> Accessor {
             );
         }
     } else {
-        for (name, value) in &document.nodes[root].attrs {
-            if let (Some(name), Some(value)) =
-                (XML_NAME.captures(&lower(name)), XML_VALUE.captures(value))
-            {
+        for attribute in &document.nodes[root].attrs {
+            if let (Some(name), Some(value)) = (
+                XML_NAME.captures(&lower(&attribute.key)),
+                XML_VALUE.captures(&attribute.value),
+            ) {
                 add_prefix(&name[1], value.get(1).map_or("", |value| value.as_str()));
             }
         }

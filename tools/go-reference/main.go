@@ -61,6 +61,7 @@ type fixture struct {
 	Classifiers  []classifierCase   `json:"classifiers"`
 	Filters      []filterCase       `json:"filters"`
 	DOM          []domCase          `json:"dom"`
+	Attributes   []attributeCase    `json:"attributes"`
 	Converters   []converterCase    `json:"converters"`
 	Siblings     []siblingCase      `json:"siblings"`
 	Tables       []tableCase        `json:"tables"`
@@ -196,6 +197,7 @@ func main() {
 	}
 	result.Filters = filterCases()
 	result.DOM = domCases()
+	result.Attributes = attributeCases()
 	result.Converters = converterCases()
 	result.Siblings = siblingCases()
 	result.Tables = tableCases()

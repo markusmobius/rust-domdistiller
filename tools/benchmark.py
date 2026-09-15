@@ -148,7 +148,7 @@ def main():
         "python": sys.version,
         "warmups": args.warmups,
         "samples": args.samples,
-        "timing_scope": "pre-parsed DOM extraction and case-sensitive snippet scoring; excludes I/O, decoding, parsing, JSON and HTML serialization",
+        "timing_scope": "pre-parsed DOM extraction and case-sensitive snippet scoring, including internal output generation; excludes I/O, decoding, initial parsing, IPC, and extra caller-side HTML serialization",
         "modes": {},
     }
     if baseline_binary:
@@ -179,10 +179,12 @@ def main():
                 mode_result["quality"][name] = {"counts": response["counts"], **metrics(response["counts"])}
                 print(f"{mode} {name}: {mode_result['quality'][name]}", flush=True)
             mode_result["differences"] = compare_outputs(quality[reference_name], quality["rust"])
-            if baseline_binary and mode_result["differences"]:
-                raise RuntimeError(f"Rust output changed: {mode_result['differences']}")
             print(f"{mode}: {len(mode_result['differences'])}/{len(pages)} pages differ", flush=True)
             mode_result["exact_pages"] = len(pages) - len(mode_result["differences"])
+            if mode_result["differences"]:
+                results["modes"][mode] = mode_result
+                save(args.output, results)
+                raise RuntimeError(f"Rust output differs from {reference_name}: {mode_result['differences']}")
             for round_index in range(args.warmups + args.samples):
                 order = [reference_name, "rust"] if round_index % 2 == 0 else ["rust", reference_name]
                 sample = {"order": order}
