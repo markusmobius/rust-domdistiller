@@ -23,5 +23,12 @@ pub mod webdoc;
 
 pub use dom::Document;
 
+pub fn apply_shared_document(
+    document: &impl AsRef<Document>,
+    options: &Options,
+) -> std::result::Result<Result, Error> {
+    apply(document.as_ref(), options)
+}
+
 #[cfg(test)]
 mod upstream_tests;

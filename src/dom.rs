@@ -73,6 +73,12 @@ pub struct Document {
     pub nodes: Vec<Node>,
 }
 
+impl AsRef<Document> for Document {
+    fn as_ref(&self) -> &Document {
+        self
+    }
+}
+
 impl Document {
     pub fn parse(html: &str) -> Self {
         let parsed = parse_document(html, RcDom::default(), Default::default()).unwrap();
@@ -557,6 +563,24 @@ fn quote_doctype(text: &str, output: &mut String) {
 #[cfg(test)]
 mod tests {
     use super::{Document, Kind};
+
+    #[test]
+    fn shared_document_view_preserves_existing_extraction() {
+        let document = Document::parse(&format!(
+            "<title>Shared article</title><article><p>{}</p></article>",
+            "A complete article with useful details and context. ".repeat(30)
+        ));
+        let snapshot = document.clone();
+        let options = crate::Options {
+            skip_pagination: true,
+            ..Default::default()
+        };
+        let expected = crate::apply(&document, &options).unwrap();
+        let actual = crate::apply_shared_document(&document, &options).unwrap();
+        assert_eq!(actual.text, expected.text);
+        assert_eq!(actual.node, expected.node);
+        assert_eq!(document, snapshot);
+    }
 
     #[test]
     fn namespaced_attribute_keys_match_go() {

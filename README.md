@@ -15,8 +15,10 @@ Add the crate to your project:
 
 ```toml
 [dependencies]
-rust-domdistiller = "1.0.0"
+rust-domdistiller = { git = "https://github.com/markusmobius/rust-domdistiller", tag = "v1.0.1" }
 ```
+
+Version 1.0.1 is a GitHub source release, not a new crates.io publication.
 
 ```rust
 use rust_domdistiller::{apply_for_reader, Options};
@@ -45,7 +47,7 @@ cargo run --locked --release --example distill -- article.html https://example.c
 ```
 
 Rust 1.98.1 is the minimum supported version and is pinned for repository builds.
-Version 1.0.0 uses the Go revision documented below, also released as
+Version 1.0.1 uses the Go revision documented below, also released as
 Go-DomDistiller v1.0.0. The checked-in benchmark compares this extraction code
 against that same Go implementation; the release version changes no algorithms.
 
@@ -54,6 +56,7 @@ against that same Go implementation; the release version changes no algorithms.
 | Entry Point | Input Behavior |
 | --- | --- |
 | `apply(&Document, &Options)` | Extract from a parsed document without mutating it. |
+| `apply_shared_document(&impl AsRef<Document>, &Options)` | Borrow a document from an integration wrapper; use the same extraction and private-copy behavior as `apply`. |
 | `apply_to_node(&Document, NodeId, &Options)` | Extract from a selected subtree; preserve the caller's tree. |
 | `apply_for_reader(impl Read, &Options)` | Detect charset, decode bytes, normalize NFD/remove soft hyphens/NFC, then extract, matching Go's reader pipeline. |
 | `apply_for_file(path, &Options)` | Open the file and use the byte-reader pipeline. |
@@ -76,6 +79,9 @@ logging and parser timing entries are not implemented.
 an immutable document. DOM conversion uses a private copy, including the second
 extraction attempt below Go's 500-word threshold. If modifying the public node
 arena directly, keep its parent/child indices valid and acyclic.
+
+`Document` implements `AsRef<Document>`. The shared-input entry point adds no
+dependency on another extractor and does not replace the existing DOM types.
 
 `Node.attrs` is `Vec<dom::Attribute>`, with `namespace`, `key`, and `value` fields,
 replacing the earlier `(String, String)` tuples. Attribute helpers match Go's
@@ -126,6 +132,17 @@ Nondeterminism and API scope:
 
 See [UPSTREAM.md](UPSTREAM.md) for source pins, the coverage ledger, reproduction
 commands, and retained attribution.
+
+## Patch Qualification
+
+The [paired extraction benchmark](https://github.com/markusmobius/content-extractor-benchmark/blob/5edcfd090f1590c9bbf26d7543fbdc2ab615e117/rust_shared_performance_2026_09_21.json)
+compares 1.0.0 with 1.0.1 in coordinated three-engine Rust suites on 2,659 pages,
+with one full warmup and four paired passes. Parsing is separate and file reads
+are untimed. DomDistiller takes 2.920 versus 2.917 ms/page on the same best two
+passes (-0.11%); the all-four-pass difference is +0.43%. Both pass the 5%
+regression gate. Scored text, metadata and errors match on every page.
+These Windows GNU/Rust 1.98.1, ThinLTO/mimalloc measurements use the shared
+Readability parser, with pagination off; they are not the standalone results below.
 
 ## Quality and Speed
 
