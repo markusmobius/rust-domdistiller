@@ -180,56 +180,7 @@ match all scored outputs; Trafilatura retains two metadata-only differences.
 Separate metadata scores, exact source pins and protocol limits are in
 [UPSTREAM.md](UPSTREAM.md#released-suite-benchmark). DomDistiller remains 1.0.1;
 these shared-input measurements use the suite's Readability parser, not the
-standalone DomDistiller reader. Older measurements below use different protocols.
-
-## Historical Patch Qualification
-
-The [paired extraction benchmark](https://github.com/markusmobius/content-extractor-benchmark/blob/5edcfd090f1590c9bbf26d7543fbdc2ab615e117/rust_shared_performance_2026_09_21.json)
-compares 1.0.0 with 1.0.1 in coordinated three-engine Rust suites on 2,659 pages,
-with one full warmup and four paired passes. Parsing is separate and file reads
-are untimed. DomDistiller takes 2.920 versus 2.917 ms/page on the same best two
-passes (-0.11%); the all-four-pass difference is +0.43%. Both pass the 5%
-regression gate. Scored text, metadata and errors match on every page.
-These Windows GNU/Rust 1.98.1, ThinLTO/mimalloc measurements use the shared
-Readability parser, with pagination off; they are not the standalone results below.
-
-## Historical Quality and Speed
-
-Both engines were evaluated on the same **983 labeled pages** from the pinned
-[content-extractor-benchmark](https://github.com/markusmobius/content-extractor-benchmark/tree/466fdbee8a504441eb78ed11d71c1da220681cab).
-These are the upstream benchmark's case-sensitive snippet scores, not token-level
-scores or a claim of universal Go/Rust equivalence. All three pagination settings
-produced the same counts: TP 2,535, FN 400, FP 375, TN 2,573.
-
-| Engine | Precision | Recall | F1 |
-| --- | ---: | ---: | ---: |
-| Go-DomDistiller | 0.871 | 0.864 | 0.867 |
-| Rust-DomDistiller | 0.871 | 0.864 | 0.867 |
-
-Median elapsed time per complete 983-page pass, comparing Go with the corrected
-Rust implementation on 2026-09-15:
-
-| Pagination | Go | Rust | Go Time / Rust Time |
-| --- | ---: | ---: | ---: |
-| Skipped | 4,180 ms | 1,374 ms | 3.04x |
-| Previous/next | 5,345 ms | 1,891 ms | 2.83x |
-| Page number | 4,241 ms | 1,474 ms | 2.88x |
-
-These measurements use Go 1.27.1 and Rust 1.98.1 release builds on an AMD Ryzen AI
-7 PRO 350 under Linux/WSL2, pinned to one logical CPU. Each engine received two
-warmup passes and ten measured passes per setting, in alternating engine order.
-The timed work is extraction from pre-parsed DOMs plus snippet scoring. Input
-I/O, charset decoding, initial parsing, IPC, and extra caller-side HTML
-serialization are excluded. Extraction's own output generation remains included.
-This is not an end-to-end file or network benchmark, and timings vary by machine.
-
-All six compared fields match exactly on **983/983 pages in every setting**:
-text, title, word count, HTML, next-page URL, and previous-page URL. The former SVG
-attribute and archived-page pagination differences are fixed at their underlying
-rules. The comparison runner fails on any output mismatch, even when snippet
-scores agree. Metadata and image lists are checked separately by the differential
-fixtures. Sample ranges, raw measurements, and reproduction commands are in
-[UPSTREAM.md](UPSTREAM.md#corpus-benchmark).
+standalone DomDistiller reader.
 
 ## Verification
 
@@ -260,9 +211,8 @@ not evidence of platform support.
 The original Go suite passes all packages (383 test functions in 47 files).
 Rust also runs 22 directly translated upstream document-title scenarios, alongside
 the 44,528 Go-generated regression cases. This is not a literal translation of
-all 383 Go test functions. The separate labeled-page benchmark above reuses the
-complete upstream manifest and scoring rules; its source-checkout runner is
-[tools/benchmark.py](tools/benchmark.py).
+all 383 Go test functions. An additional opt-in labeled-page comparison is
+available through [tools/benchmark.py](tools/benchmark.py).
 
 ## License
 
