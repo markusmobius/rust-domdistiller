@@ -7,7 +7,7 @@ description = "Native Rust port of Go-DomDistiller"
 repository = "https://github.com/markusmobius/rust-domdistiller"
 readme = "README.md"
 license = "MIT AND BSD-3-Clause AND Apache-2.0 AND ICU"
-include = ["src/**", "examples/**", "testdata/**", "tools/go-reference/**", "licenses/**", "LICENSE", "NOTICE", "README.md", "UPSTREAM.md", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml"]
+include = ["src/**", "examples/**", "testdata/**", "tools/go-reference/**", "licenses/**", "LICENSE", "NOTICE", "README.md", "CHANGELOG.md", "UPSTREAM.md", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml"]
 
 [dependencies]
 regex = "1.12"

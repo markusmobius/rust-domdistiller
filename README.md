@@ -15,10 +15,11 @@ Add the crate to your project:
 
 ```toml
 [dependencies]
-rust-domdistiller = { git = "https://github.com/markusmobius/rust-domdistiller", tag = "v1.0.1" }
+rust-domdistiller = "=1.0.1"
 ```
 
-Version 1.0.1 is a GitHub source release, not a new crates.io publication.
+Version 1.0.1 is available on [crates.io](https://crates.io/crates/rust-domdistiller/1.0.1)
+and as a [GitHub source release](https://github.com/markusmobius/rust-domdistiller/releases/tag/v1.0.1).
 See [CHANGELOG.md](CHANGELOG.md) for subsequent documentation updates.
 
 ```rust

@@ -1,5 +1,11 @@
 # Changelog
 
+## crates.io Publication - 2026-09-23
+
+- Publish `rust-domdistiller` 1.0.1 on crates.io with the same runtime sources
+  as the existing GitHub release. Include this changelog in the archive and
+  update registry installation instructions; the original tag is unchanged.
+
 ## Documentation - 2026-09-23
 
 - Refresh README quality and six-engine speed comparisons from the published
