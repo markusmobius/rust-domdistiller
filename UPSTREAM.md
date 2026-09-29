@@ -1,5 +1,14 @@
 # Upstream and Compatibility Ledger
 
+## Documentation Release 1.0.3
+
+`rust-domdistiller` 1.0.3 packages the approved nine-section README and the full
+format, philosophy and creator-credit requirements in [AGENTS.md](AGENTS.md).
+The named upstream creators remain distinct from the port maintainer. Runtime
+source and dependencies are unchanged from 1.0.2; only documentation, the root
+package version and its descriptive metadata change. Measured 1.0.1 results
+and their immutable reports are not relabeled or rerun.
+
 ## Documentation Release 1.0.2
 
 This patch packages the aligned README, technical/changelog updates and

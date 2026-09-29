@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.3 - 2026-09-29
+
+- Documentation-only release of `rust-domdistiller`; runtime source and
+  dependency pins are unchanged from 1.0.2.
+- Apply the approved nine-section README format, covering supplied HTML,
+  upstream fidelity, native performance, runnable usage and actual options.
+- Require named creator acknowledgments in AGENTS.md and retain explicit
+  credits for the Chromium Authors, Christian Kohlschuetter, Radhi Fadlillah
+  and Markus Mobius in the README.
+- Use full package names in shared comparisons and package descriptions.
+  Keep actual benchmark version labels and reports unchanged; no new run.
+
 ## 1.0.2 - 2026-09-29
 
 - Documentation-only release; runtime source and dependency pins are unchanged

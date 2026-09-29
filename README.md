@@ -1,221 +1,205 @@
-# Rust-DomDistiller
+# rust-domdistiller
 
-Rust-DomDistiller finds the main readable content and metadata in an HTML page.
-It is a native Rust port of [Go-DomDistiller](https://github.com/markusmobius/go-domdistiller),
-which is based on Chromium's DOM Distiller and Boilerpipe. The pinned **Go
-implementation is the behavioral reference**; there is no Python original.
+`rust-domdistiller` extracts article text, HTML, images, metadata and pagination
+links from supplied HTML. It is a native Rust port of
+[go-domdistiller](https://github.com/markusmobius/go-domdistiller), descended
+from `chromium/dom-distiller` and `kohlschutter/boilerpipe`.
 
-The library extracts article HTML, text, title, metadata, images, and pagination
-links from supplied documents. It requires no browser, Go process, Python runtime,
-network access, or internal worker threads. Callers own fetching and concurrency.
+## Philosophy
+
+Our extractor packages share three principles:
+
+1. **Bring your own HTML.** Keep page acquisition separate from extraction.
+	The primary workflow uses HTML supplied by the caller, who controls fetching,
+	caching, rendering, retries and scheduling.
+2. **Stay close to upstream.** Preserve the algorithms and behavior of each
+	package's declared upstream reference as closely as possible. Document
+	deliberate differences and compatibility limits in [UPSTREAM.md](UPSTREAM.md)
+	rather than claiming exact equivalence on every page.
+3. **Provide very fast Go and Rust packages.** Run extraction natively, without
+	a Python or Java runtime. Improve throughput and allocation efficiency while
+	preserving intended behavior, and substantiate performance with reproducible
+	benchmarks that report quality alongside speed.
+
+## Overview
+
+The current `rust-domdistiller` release is **1.0.3**. It accepts HTML readers,
+decoded strings, files or parsed trees and returns article HTML/text, title,
+metadata, image URLs, word count and previous/next page links. It does not
+fetch pages or run a browser. Callers own acquisition and concurrency.
+
+Its behavioral reference is the `go-domdistiller` main-branch implementation
+released as v1.0.0, not the separate stable branch or the original Java code.
+This documentation-only release preserves the preceding release's runtime
+source and dependency pins. No Go process or internal worker pool is required.
+
+## Installation
+
+```sh
+cargo add rust-domdistiller@=1.0.3
+```
+
+Use Rust 1.98.1 or newer. Import the crate as `rust_domdistiller`. See
+[Cargo.toml](Cargo.toml) for dependencies and [CHANGELOG.md](CHANGELOG.md)
+for release changes.
 
 ## Usage
 
-Add the crate to your project:
-
-```toml
-[dependencies]
-rust-domdistiller = "=1.0.2"
-```
-
-Version 1.0.2 is available on [crates.io](https://crates.io/crates/rust-domdistiller/1.0.2)
-and as a [GitHub source release](https://github.com/markusmobius/rust-domdistiller/releases/tag/v1.0.2).
-This documentation-only patch keeps 1.0.1's runtime source and dependency pins.
-See [CHANGELOG.md](CHANGELOG.md) for release changes.
+Extract text from HTML already held in memory:
 
 ```rust
 use rust_domdistiller::{apply_for_reader, Options};
 
-# fn main() -> Result<(), Box<dyn std::error::Error>> {
-let html = "<title>Research update</title><article><p>The research team \
-            published its results and described the evidence in detail.</p></article>";
-let options = Options {
-    original_url: Some("https://example.com/news/story".into()),
-    skip_pagination: true,
-    ..Options::default()
-};
-let result = apply_for_reader(html.as_bytes(), &options)?;
-assert_eq!(result.title, "Research update");
-println!("{}", result.node.to_html());
-println!("{}", result.text);
-# Ok(())
-# }
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let source = r#"<html><head><title>Research results</title></head><body><article>
+<h1>Research results</h1>
+<p>The research team compared several methods for extracting articles from saved
+web pages. Every method received the same original HTML, and the evaluation
+kept the reference text separate from the input supplied to each extractor.</p>
+<p>The report records the complete experiment, including errors and repeated
+measurements. Its results describe this collection of pages and do not promise
+the same quality or execution time for every website.</p>
+</article></body></html>"#;
+    let options = Options {
+        original_url: Some("https://example.org/research".into()),
+        skip_pagination: true,
+        ..Options::default()
+    };
+    let result = apply_for_reader(source.as_bytes(), &options)?;
+
+    println!("{}", result.text);
+    Ok(())
+}
 ```
 
-The file example prints extracted HTML to stdout and its title and word count to
-stderr:
-
-```sh
-cargo run --locked --release --example distill -- article.html https://example.com/news/story
-```
-
-Rust 1.98.1 is the minimum supported version and is pinned for repository builds.
-Version 1.0.2 uses the Go revision documented below, also released as
-Go-DomDistiller v1.0.0. The checked-in benchmark compares this extraction code
-against that same Go implementation; the release version changes no algorithms.
-
-## API
-
-| Entry Point | Input Behavior |
+| Entry Point | Input |
 | --- | --- |
-| `apply(&Document, &Options)` | Extract from a parsed document without mutating it. |
-| `apply_shared_document(&impl AsRef<Document>, &Options)` | Borrow a document from an integration wrapper; use the same extraction and private-copy behavior as `apply`. |
-| `apply_to_node(&Document, NodeId, &Options)` | Extract from a selected subtree; preserve the caller's tree. |
-| `apply_for_reader(impl Read, &Options)` | Detect charset, decode bytes, normalize NFD/remove soft hyphens/NFC, then extract, matching Go's reader pipeline. |
-| `apply_for_file(path, &Options)` | Open the file and use the byte-reader pipeline. |
-| `apply_for_html(&str, &Options)` | UTF-8 fast path: equivalent to extraction from `Document::parse`; no charset detection or reader normalization. |
+| `apply` | A parsed `Document`, preserved during extraction |
+| `apply_shared_document` | An integration wrapper implementing `AsRef<Document>` |
+| `apply_to_node` | A selected subtree of a parsed document |
+| `apply_for_reader` | Reader bytes, with charset detection and normalization |
+| `apply_for_file` | A local file using the byte-reader pipeline |
+| `apply_for_html` | Decoded UTF-8, without reader normalization |
 
-`Options::default()` uses `pagination::PaginationAlgo::PrevNext`. Pagination runs
-only when `original_url` is `Some` and `skip_pagination` is false. Set
-`pagination_algo` to `PaginationAlgo::PageNumber` for Go's numbered-page algorithm.
-URL parsing, resolution, raw host case, explicit ports, and URL serialization
-follow the Go reference instead of WHATWG URL normalization. `Some("")` and `None`
-are distinct, as an empty Go URL and a nil Go URL are distinct.
+Use `result.text` for text and `result.node.to_html()` for HTML. Results also
+expose `title`, `markup_info`, `content_images`, `word_count`, `pagination_info`
+and `timing_info`. See the
+[rust-domdistiller API reference](https://docs.rs/rust-domdistiller/1.0.3/rust_domdistiller/)
+for complete types and signatures.
 
-`Result` exposes `url`, `title`, `markup_info`, `pagination_info`, `word_count`,
-`node`, `text`, `content_images`, and `timing_info`. The HTML result has a `div`
-root. Metadata retains optional author/image lists to distinguish absent lists
-from present empty lists. Durations measure the Rust execution; detailed Go
-logging and parser timing entries are not implemented.
+## Options
 
-`Document`, `Options`, and `Result` are `Send + Sync`. Independent calls may share
-an immutable document. DOM conversion uses a private copy, including the second
-extraction attempt below Go's 500-word threshold. If modifying the public node
-arena directly, keep its parent/child indices valid and acyclic.
+Start with `Options::default()`:
 
-`Document` implements `AsRef<Document>`. The shared-input entry point adds no
-dependency on another extractor and does not replace the existing DOM types.
+| Option | Default | Effect |
+| --- | --- | --- |
+| `original_url` | `None` | Supplies URL context; `Some("")` remains distinct from no URL. |
+| `skip_pagination` | `false` | Set to `true` to omit pagination detection. |
+| `pagination_algo` | `PaginationAlgo::PrevNext` | Use scored previous/next links, or select `PageNumber` for numbered links. |
 
-`Node.attrs` is `Vec<dom::Attribute>`, with `namespace`, `key`, and `value` fields,
-replacing the earlier `(String, String)` tuples. Attribute helpers match Go's
-first local-key occurrence; setting a value preserves its namespace, and removing
-it exposes the next matching key. For example, an SVG `xlink:href` has namespace
-`"xlink"` and key `"href"`, while an ordinary HTML `xlink:href` remains a literal
-key. The `attr`, `has_attr`, `set_attr`, and `remove_attr` signatures are unchanged.
-
-## Compatibility
-
-The reference is Go-DomDistiller
-`v0.0.0-20240926050704-25b8d046ffb4`, source
-`25b8d046ffb4053bf68345d6fa59bc9ae1961ad8`, running on Go 1.27.1 with its pinned
-dependencies. This follows that Go revision, not Chromium's original Java
-implementation or Go-DomDistiller's separate stable branch.
-
-**Go behavioral parity is the requirement, not just parity on tested cases.**
-Deterministic differences are compatibility bugs, including on malformed HTML,
-foreign content, unusual URLs, and inputs not yet covered by the suite. Tests
-provide evidence of compatibility; they do not limit the supported input domain.
-
-The offline corpus contains **44,528 Go-generated cases** covering word counters,
-block classifiers and filters, DOM conversion, tables/media, metadata, both
-pagination algorithms, URLs, charset scores, byte decoding, and full extraction.
-It includes the upstream saved HTML page in all four pagination/skip settings.
-Full results compare exact HTML, text, image order, metadata, title, word count,
-and pagination. These are regression cases, not 44,528 independent web pages.
-
-Parsing uses third-party html5gum and html5ever with a local Go-compatibility
-adapter. Attribute namespaces, local keys, duplicates, and order are preserved
-according to Go's rules. Go's extraction clones also omit element namespaces;
-that is distinct from attribute namespaces, which both implementations retain.
-
-Nondeterminism and API scope:
-
-- Go's charset detector races equal-confidence recognizers. Rust uses a fixed
-  recognition order with the same scores and creates no threads. A different
-  winner is possible on genuinely ambiguous inputs. Saved reader cases assert
-  that tied winners decode identically; non-equivalent ties are not waived.
-- Go's numbered-pagination candidate map can break equal-ranked ties in map
-  iteration order. Rust uses stable key ordering. Go itself has no fixed winner
-  for those ties; candidate and ranking semantics must still match.
-- There is no computed CSS, JavaScript execution, fetching, or browser layout,
-  consistent with the server-side Go engine. Go's `ApplyForURL`, `LogFlags`,
-  logging output, and detailed parser timing entries are not ported.
-- The output follows Go's attribute and link handling. It is **not an HTML
-  security sanitizer**; sanitize separately before displaying untrusted content.
-
-See [UPSTREAM.md](UPSTREAM.md) for source pins, the coverage ledger, reproduction
-commands, and retained attribution.
+Pagination runs only with URL context and identifies links rather than
+assembling a multi-page article. The comparison below disables it. URL
+resolution follows the Go reference rather than WHATWG normalization.
+`Document`, `Options` and `Result` are `Send + Sync`; independent calls may
+share an immutable document while extraction makes its own working copies.
 
 ## Current Quality and Speed
 
 The [2026-09-29 shared benchmark](https://github.com/markusmobius/content-extractor-benchmark/blob/ec719092d12f4d2a438dd29d9f4405aab6e0a321/README.md#results-2026-09-29)
-compares all six implementations on **2,659 saved pages**: 983 LegoNews,
-181 ScrapingHub and 1,495 WCXB. All six READMEs use this same comparison.
+compares the six packages below on **2,659 saved pages**: 983 LegoNews,
+181 ScrapingHub and 1,495 WCXB.
 
 ### Extraction Speed
 
-| Extractor | Go Version | Rust Version | Go ms/page | Rust ms/page | Go/Rust |
-| --- | --- | --- | ---: | ---: | ---: |
-| Readability | 0.6.0 | 0.6.5 | 4.755 | 3.945 | 1.21x |
-| DomDistiller | 1.0.0 | 1.0.1 | 6.159 | 3.400 | 1.81x |
-| Trafilatura FAST | 2.2.6 | 2.2.6 | 11.329 | 6.570 | 1.72x |
+| Go Package (Measured Version) | Rust Package (Measured Version) | Go ms/page | Rust ms/page | Go/Rust |
+| --- | --- | ---: | ---: | ---: |
+| `go-readabilityV2` 0.6.0 | `rust-readability-v2` 0.6.5 | 4.755 | 3.945 | 1.21x |
+| `go-domdistiller` 1.0.0 | `rust-domdistiller` 1.0.1 | 6.159 | 3.400 | 1.81x |
+| `go-trafilatura` 2.2.6 (FAST) | `rust-trafilatura` 2.2.6 (FAST) | 11.329 | 6.570 | 1.72x |
 
 Times are means of **all four measured passes after one warmup**. Go/Rust is
-Go time divided by Rust time, not an old/new release speedup. Measured versions
-are shown explicitly; later documentation-only releases are not new measurements.
+the named Go package's time divided by the named Rust package's time, not an
+old/new release speedup. Later documentation-only releases do not change the
+versions actually measured.
 
 The run used Windows 11, Ryzen AI 7 PRO 350, Go 1.27.1 and Rust 1.98.1 GNU
 with ThinLTO/mimalloc. Extraction includes required working copies, metadata
 and text rendering. File I/O, startup, IPC, response serialization and scoring
-are excluded. Comments, pagination and Trafilatura external fallback are off;
-tables are on. Power and sleep checks passed.
+are excluded. Comments and pagination are off; tables are on.
+`go-trafilatura` and `rust-trafilatura` use FAST with external fallback disabled.
+Power and sleep checks passed.
 
 Parsing is separate: **Go 11.283 / Rust 6.386 ms/page**, charged once per
 language/page for the shared suite. It includes decoding, DOM construction and
-the separate Trafilatura noscript tree when needed. These are extraction-stage
-comparisons, not complete request latencies.
+the separate `go-trafilatura` / `rust-trafilatura` noscript tree when needed.
+These are extraction-stage comparisons, not complete request latencies.
 
 ### Text Quality
 
-Go and Rust have the same text scores for each engine. Errors are listed in
-LegoNews / ScrapingHub / WCXB order and remain in the scoring denominators.
+Each named pair has equal text scores. Errors are listed in LegoNews /
+ScrapingHub / WCXB order and remain in the scoring denominators.
 
-| Extractor | LegoNews F1 | ScrapingHub F1 | WCXB F1 | Errors |
-| --- | ---: | ---: | ---: | --- |
-| Readability | 87.82711% | 95.20557% | 78.47603% | 7 / 0 / 28 |
-| DomDistiller | 86.74080% | 92.74280% | 74.39696% | 0 / 0 / 0 |
-| Trafilatura FAST | 90.91534% | 96.15663% | 78.51703% | 4 / 0 / 10 |
+| Go Package | Rust Package | LegoNews F1 | ScrapingHub F1 | WCXB F1 | Errors |
+| --- | --- | ---: | ---: | ---: | --- |
+| `go-readabilityV2` | `rust-readability-v2` | 87.82711% | 95.20557% | 78.47603% | 7 / 0 / 28 |
+| `go-domdistiller` | `rust-domdistiller` | 86.74080% | 92.74280% | 74.39696% | 0 / 0 / 0 |
+| `go-trafilatura` (FAST) | `rust-trafilatura` (FAST) | 90.91534% | 96.15663% | 78.51703% | 4 / 0 / 10 |
 
 The corpora use different scoring rules; their F1 scores must not be averaged.
-Equal text scores do not imply identical metadata: Trafilatura differs on one
-title and one author field. The [full report](https://github.com/markusmobius/content-extractor-benchmark/blob/49c426d6135df81b7d492bea7e6aec8e6d77d80c/go_rust_shared_performance_2026_09_29.json)
+Equal text scores do not imply identical metadata: `go-trafilatura` and
+`rust-trafilatura` differ on one title and one author field. The
+[full report](https://github.com/markusmobius/content-extractor-benchmark/blob/49c426d6135df81b7d492bea7e6aec8e6d77d80c/go_rust_shared_performance_2026_09_29.json)
 contains metadata scores, differences, every pass and source/build identities.
 
-## Verification
+## Compatibility and Limitations
 
-After Cargo dependencies are fetched, ordinary tests require neither Go nor
-network access:
+- **Declared reference.** General `go-domdistiller` v1.0.0 behavior is the
+  target. Deterministic differences are compatibility bugs, not acceptable
+  merely because a finite test corpus misses them.
+- **No browser rendering.** CSS-dependent browser behavior and JavaScript
+  execution are not provided. The Go URL-fetching helper, detailed logging
+  and parser timing entries are not ported.
+- **Ambiguous ties.** Charset recognition and equally ranked numbered-page
+  candidates can be nondeterministic in Go. Rust uses stable ordering while
+  retaining the reference scores and ranking rules.
+- **DOM invariants.** Callers editing node arenas must keep indices valid and
+  acyclic. Attribute namespaces, order and duplicate local keys matter.
+- **Not a sanitizer.** Sanitize extracted HTML before displaying untrusted input.
+
+See [UPSTREAM.md](UPSTREAM.md) for source pins, compatibility boundaries,
+the regression coverage ledger and historical measurements.
+
+## Development
+
+Use the pinned Rust toolchain. Ordinary tests need no Go runtime:
 
 ```sh
 cargo fmt --all -- --check
-cargo test --locked --offline
+cargo test --locked
 cargo clippy --locked --all-targets -- -D warnings
-cargo test --locked --release
-cargo build --locked --release
+cargo package --locked
 ```
 
-The opt-in live test requires Go 1.27.1 and downloads only the pinned development
-dependencies when they are not cached:
+The optional live reference check requires Go 1.27.1 and cached or downloadable
+pinned development dependencies:
 
 ```sh
 cargo test --locked --lib live_go_parity -- --ignored --nocapture
 ```
 
-Set `GO` to the Go executable if it is not on `PATH`. Alternatively, independently
-export the fixture and set `GO_DOMDISTILLER_REFERENCE` to its absolute path. The
-live check requires an exact byte match to the snapshot exercised by the offline
-tests. Linux and Windows checks are configured in CI; unexecuted hosted jobs are
-not evidence of platform support.
+Set `GO` to the executable if needed. Package verification requires a clean
+release checkout. Documentation and release rules are in [AGENTS.md](AGENTS.md).
 
-The original Go suite passes all packages (383 test functions in 47 files).
-Rust also runs 22 directly translated upstream document-title scenarios, alongside
-the 44,528 Go-generated regression cases. This is not a literal translation of
-all 383 Go test functions. An additional opt-in labeled-page comparison is
-available through [tools/benchmark.py](tools/benchmark.py).
+## License and Credits
 
-## License
+The translation retains MIT, BSD-3-Clause, Apache-2.0 and ICU terms. See
+[LICENSE](LICENSE), [NOTICE](NOTICE) and [licenses](licenses), including the
+[complete Chromium notice](licenses/LICENSE-chromium.txt). Dependencies retain
+their own licenses.
 
-See [LICENSE](LICENSE), [NOTICE](NOTICE), and the retained files in
-[licenses](licenses). The Rust translation retains the applicable Go-DomDistiller
-MIT, Chromium/Go BSD, Boilerpipe Apache-2.0, and chardet/ICU notices. Cargo
-dependencies retain their own licenses.
+The Chromium Authors created `chromium/dom-distiller`, building on
+Christian Kohlschuetter's `kohlschutter/boilerpipe`. Radhi Fadlillah implemented
+the original `go-domdistiller` port and the inherited `go-shiori/dom` work.
+Markus Mobius maintains `go-domdistiller` and this `rust-domdistiller` translation.
+The Go Authors, chardet Authors and IBM/ICU contributors are also credited in the
+retained notices for adapted URL, reader and charset behavior.
