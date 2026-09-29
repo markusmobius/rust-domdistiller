@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.2 - 2026-09-29
+
+- Documentation-only release; runtime source and dependency pins are unchanged
+  from 1.0.1.
+- Use the same September 29 six-engine speed and quality comparison in all six
+  library READMEs, with consistent units, measured versions and timing boundaries.
+- Include AGENTS.md with instructions for keeping README, UPSTREAM, CHANGELOG,
+  release notes and crate documentation consistent.
+- Package the revised documentation on crates.io. Benchmark rows retain the
+  versions actually measured; this release introduces no new measurements.
+
 ## crates.io Publication - 2026-09-23
 
 - Publish `rust-domdistiller` 1.0.1 on crates.io with the same runtime sources
