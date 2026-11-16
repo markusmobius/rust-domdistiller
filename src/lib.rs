@@ -7,6 +7,7 @@ mod domutil;
 mod embed;
 mod encoding;
 mod extraction;
+mod html5ever_bridge;
 
 pub use extraction::{
     apply, apply_for_file, apply_for_html, apply_for_reader, apply_to_node, Error, Options, Result,

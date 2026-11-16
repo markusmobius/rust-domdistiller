@@ -23,20 +23,22 @@ Our extractor packages share three principles:
 
 ## Overview
 
-The current `rust-domdistiller` release is **1.0.3**. It accepts HTML readers,
+The current `rust-domdistiller` release is **1.0.4**. It accepts HTML readers,
 decoded strings, files or parsed trees and returns article HTML/text, title,
 metadata, image URLs, word count and previous/next page links. It does not
 fetch pages or run a browser. Callers own acquisition and concurrency.
 
 Its behavioral reference is the `go-domdistiller` main-branch implementation
 released as v1.0.0, not the separate stable branch or the original Java code.
-This documentation-only release preserves the preceding release's runtime
-source and dependency pins. No Go process or internal worker pool is required.
+Release 1.0.4 moves HTML tree construction from html5ever 0.29 to 0.39, the
+generation used by sibling crates, with unchanged extraction output on the Go
+reference fixtures and benchmark corpus. No Go process or internal worker pool
+is required.
 
 ## Installation
 
 ```sh
-cargo add rust-domdistiller@=1.0.3
+cargo add rust-domdistiller@=1.0.4
 ```
 
 Use Rust 1.98.1 or newer. Import the crate as `rust_domdistiller`. See
@@ -84,7 +86,7 @@ the same quality or execution time for every website.</p>
 Use `result.text` for text and `result.node.to_html()` for HTML. Results also
 expose `title`, `markup_info`, `content_images`, `word_count`, `pagination_info`
 and `timing_info`. See the
-[rust-domdistiller API reference](https://docs.rs/rust-domdistiller/1.0.3/rust_domdistiller/)
+[rust-domdistiller API reference](https://docs.rs/rust-domdistiller/1.0.4/rust_domdistiller/)
 for complete types and signatures.
 
 ## Options

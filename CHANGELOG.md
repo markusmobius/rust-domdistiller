@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.4 - 2026-11-16
+
+- Build HTML trees with html5ever 0.39 instead of 0.29, through a local port of
+  html5gum's html5ever bridge. rust-trafilatura and other users no longer pull a
+  second html5ever/markup5ever stack through this crate.
+- Use compatible (`^`) dependency requirements.
+- Extraction output is unchanged on all 44,528 Go reference fixture cases and a
+  3,031-page comparison with 1.0.3. Parsed trees now keep
+  `<template shadowrootmode>` elements (matching Go) and, following the current
+  HTML standard, elements nested inside `<select>`/`<option>` (unlike Go).
+
 ## 1.0.3 - 2026-09-29
 
 - Documentation-only release of `rust-domdistiller`; runtime source and

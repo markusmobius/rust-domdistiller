@@ -1,5 +1,37 @@
 # Upstream and Compatibility Ledger
 
+## Parser Dependency Release 1.0.4
+
+`rust-domdistiller` 1.0.4 moves tree construction from html5ever 0.29 to 0.39
+([rust-trafilatura#2](https://github.com/markusmobius/rust-trafilatura/issues/2)).
+html5gum's `tree-builder` feature requires html5ever 0.29 in every html5gum
+release, which put a second html5ever/markup5ever/tendril/string_cache/phf stack
+into rust-trafilatura's dependency graph. The html5gum-to-html5ever bridge is now
+a local adaptation of html5gum 0.8.4's `emitters/html5ever.rs`
+([src/html5ever_bridge.rs](src/html5ever_bridge.rs)), so html5gum is used without
+that feature. Token translation is unchanged; the bridge ignores html5ever 0.39's
+new encoding indicator and passes the scripting option that 0.29 read implicitly.
+Dependency requirements are compatible (`^`): html5gum 0.8.4, html5ever and
+markup5ever_rcdom 0.39.
+
+Validation on Rust 1.98.1 Linux (WSL): formatting, strict Clippy, doctests and
+all 44,528 Go reference fixture cases pass. A differential run against 1.0.3
+covered 3,031 benchmark-corpus pages plus 16 synthetic documents (12,178
+comparisons over both pagination algorithms, with and without URLs): extracted
+title, text, content HTML, images, metadata, word counts and pagination are
+identical. `Document::parse` trees differ on 18 pages and 2 synthetic cases,
+with identical visible text:
+
+- `<template shadowrootmode>`: html5ever 0.29 discarded the template element and
+  kept its children; 0.39 retains it, matching the pinned Go parser.
+- Customizable `<select>`: html5ever 0.39 implements the current HTML rule that
+  keeps elements such as `span`, `b` or `button` inside `select`/`option`, where
+  html5ever 0.29 and the pinned Go parser (x/net `v0.29.0`) drop those tags and
+  keep their text. html5ever 0.39 has no option to restore the old rule, so this
+  is a known difference in the parsed tree. No compared extraction changed.
+
+Measured 1.0.1 benchmark results are not relabeled or rerun.
+
 ## Documentation Release 1.0.3
 
 `rust-domdistiller` 1.0.3 packages the approved nine-section README and the full
@@ -112,8 +144,8 @@ go-colorable `v0.1.13`, go-isatty `v0.0.20`, x/net `v0.29.0`, x/text `v0.18.0`,
 and x/sys `v0.25.0`. The oracle checks the complete graph and platform-specific
 linked build metadata. Test-only transitive modules are locked in its go.sum.
 
-Runtime parsing uses third-party html5gum tokenization, html5ever HTML5 tree
-construction, and a local adapter into the native node arena. The adapter retains
+Runtime parsing uses third-party html5gum tokenization, html5ever 0.39 HTML5 tree
+construction through a local html5gum bridge, and a local adapter into the native node arena. The adapter retains
 attribute order and duplicates, and applies the pinned Go parser's foreign
 attribute adjustment rules. Attributes store namespace, local key, and value
 separately; lookups and filters compare the local key, while rendering restores

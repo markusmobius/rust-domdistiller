@@ -1,4 +1,4 @@
-use html5gum::emitters::html5ever::parse_document;
+use crate::html5ever_bridge::{parse_document, parse_fragment};
 use markup5ever_rcdom::{NodeData, RcDom};
 
 pub type NodeId = usize;
@@ -86,7 +86,7 @@ impl Document {
     }
 
     pub(crate) fn fragment(html: &str, tag: &str) -> Self {
-        let parsed = html5gum::emitters::html5ever::parse_fragment(
+        let parsed = parse_fragment(
             html,
             RcDom::default(),
             Default::default(),

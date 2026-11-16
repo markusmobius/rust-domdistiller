@@ -31,6 +31,11 @@ licenses/icu-license.html. The ICU-derived portions retain the copyright
 and permission notice of International Business Machines Corporation and
 others, 1995-2012. No endorsement by the original authors is implied.
 
+html5gum: Copyright (c) 2021 Markus Unterwaditzer. The html5gum-to-html5ever
+tree-builder bridge in src/html5ever_bridge.rs is adapted from html5gum 0.8.4
+src/emitters/html5ever.rs for the html5ever 0.39 API under
+licenses/LICENSE-html5gum.txt.
+
 The development fixture includes the saved page shipped in the pinned Go
 module, with its original page content and attribution. The page is from
 VICE and is used only as a compatibility regression input. This does not

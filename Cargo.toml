@@ -1,6 +1,6 @@
 [package]
 name = "rust-domdistiller"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 rust-version = "1.98.1"
 description = "Native Rust port of go-domdistiller"
@@ -11,9 +11,9 @@ include = ["src/**", "examples/**", "testdata/**", "tools/go-reference/**", "lic
 
 [dependencies]
 regex = "1.12"
-html5gum = { version = "0.8.4", features = ["tree-builder"] }
-html5ever = "0.29.1"
-markup5ever_rcdom = "0.5.0-unofficial"
+html5gum = "0.8.4"
+html5ever = "0.39"
+markup5ever_rcdom = "0.39"
 percent-encoding = "2.3"
 unicode-normalization = "0.1"
 encoding_rs = "0.8"
